@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
 import {getFromStorage} from "../../utils/storage";
+import fakeAuth from "../Auth/fakeAuth";
+import withRouter from "react-router/es/withRouter";
 
 class About extends Component {
   constructor(props) {
@@ -26,6 +28,7 @@ class About extends Component {
         .then(json =>{
           if(json.success){
             window.localStorage.removeItem("the_main_app");
+            fakeAuth.signout();
             this.setState({
               //clear token
               token:'',
@@ -45,11 +48,26 @@ class About extends Component {
   }
 
   render() {
-    return (
-      <div>
-        <h1>this is Account</h1>
-        <button onClick={this.logout}>Logout</button>
-      </div>
+    const AuthButton = withRouter(
+      ({ history }) =>
+        fakeAuth.isAuthenticated ? (
+          <p>
+            Welcome!{" "}
+            <button
+              onClick={() => {
+                this.logout(() => history.push("/"));
+              }}
+            >
+              Sign out
+            </button>
+          </p>
+        ) : (
+          <p>You are not logged in.</p>
+        )
+    );
+
+    return(
+      <AuthButton />
     );
   }
 }
