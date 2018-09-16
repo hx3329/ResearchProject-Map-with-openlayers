@@ -2,7 +2,7 @@
   "name": "MERN-findgroup",
   "version": "1.0.0",
   "description": "MERN project findgroup",
-  "author": "Eugene Cheung",
+  "author": "Shane, Zhu, Xishang",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/hx3329/findgroup3.git"
@@ -39,6 +39,7 @@
     "react-dom": "^16.2.0",
     "react-hot-loader": "^4.0.0",
     "react-router": "^4.2.0",
+    "react-router-auth": "^1.0.1",
     "react-router-dom": "^4.2.2",
     "sass-loader": "^6.0.7",
     "semantic-ui-css": "^2.3.3",

@@ -25,6 +25,7 @@ class About extends Component {
         .then(res => res.json())
         .then(json =>{
           if(json.success){
+            window.localStorage.removeItem("the_main_app");
             this.setState({
               //clear token
               token:'',
