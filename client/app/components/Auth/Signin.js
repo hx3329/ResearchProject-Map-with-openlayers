@@ -7,7 +7,6 @@ import {
 } from "../../utils/storage";
 import fakeAuth from "./fakeAuth";
 import Redirect from "react-router-dom/es/Redirect";
-import Group from "../Group/Group";
 //style
 const Style = {
   margin: '20px',

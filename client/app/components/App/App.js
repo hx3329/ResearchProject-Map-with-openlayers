@@ -9,6 +9,7 @@ import Signin from "../Auth/Signin";
 import Register from "../Auth/Register";
 import NotFound from "./NotFound";
 import Work from "../Pages/Work";
+import MapPage from "../Pages/Map";
 
 import fakeAuth from "../Auth/fakeAuth";
 // import {getFromStorage} from "../../utils/storage";
@@ -82,6 +83,7 @@ class App extends React.Component{
             <Route path="/login" component={Signin} />
             <Route path="/signup" component={Register}/>
             <Route path="/work" component={Work}/>
+            <Route path="/map" component={MapPage}/>
             <PrivateRoute path="/group" component={Group}/>
             {/*<FadingRoute path="/group" component={Group}/>*/}
             {/*<AuthRoute path="/group" component={Group} redirectTo="/login" authenticated={this.state.authenticated} />*/}
