@@ -95,11 +95,11 @@ class SignUpPage extends React.Component{
       headers:{
         'Content-Type':'application/json'
       },
-        body: JSON.stringify({
-          firstName: signUpFirstName,
-          lastName: signUpLastName,
-          email: signUpEmail,
-          password: signUpPassword
+      body: JSON.stringify({
+        firstName: signUpFirstName,
+        lastName: signUpLastName,
+        email: signUpEmail,
+        password: signUpPassword
       }),
 
     }).then(res => res.json())

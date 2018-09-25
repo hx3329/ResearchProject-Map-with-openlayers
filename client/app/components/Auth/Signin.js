@@ -178,7 +178,7 @@ class LoginPage extends React.Component{
     }
 
     return(
-        <Redirect to={from} />
+      <Redirect to={from} />
     );
   }
 }

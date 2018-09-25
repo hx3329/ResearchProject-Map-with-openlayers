@@ -51,7 +51,7 @@ class DesktopContainer extends Component {
             >
               <Container>
                 <Menu.Item>
-                {/*<Image src='/logo.png' size='tiny'/>*/}
+                  {/*<Image src='/logo.png' size='tiny'/>*/}
                 </Menu.Item>
                 <Menu.Item name='home'
                            active={activeItem === 'home'}

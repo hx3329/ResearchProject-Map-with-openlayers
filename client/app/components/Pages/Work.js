@@ -47,8 +47,8 @@ class Work extends Component {
       });
   }
 
-    render() {
-      const {inputError} = this.state;
+  render() {
+    const {inputError} = this.state;
     return (
 
       <div>
@@ -58,8 +58,8 @@ class Work extends Component {
           ):(null)
         }
         <h1>This is Work</h1>
-          <input type="name" label="Name" value={this.state.inputName} onChange={this.handleNameChange}/>
-          <button onClick={this.inputName}>Submit</button>
+        <input type="name" label="Name" value={this.state.inputName} onChange={this.handleNameChange}/>
+        <button onClick={this.inputName}>Submit</button>
       </div>
     );
   }
