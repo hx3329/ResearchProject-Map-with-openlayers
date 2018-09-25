@@ -248,10 +248,26 @@ const view = new View({
 });
 
 class MapPage extends Component {
-  state={
-    selectStyle:'AerialWithLabels'
+  constructor(props){
+    super(props);
+    this.state = {
+      selectStyle:'AerialWithLabels',
+      airlines:[]
+    };
   }
+
+
   componentDidMount(){
+    //get map airlines
+    fetch('/api/airline')
+      .then(res => res.json())
+      .then(json => {
+        this.setState({
+          airlines: json
+        });
+        localStorage.setItem('the_main_map',JSON.stringify(json));
+      });
+
     //select map of bind
     var layers = [];
     for (var i = 0; i < styles.length; i++) {
@@ -301,12 +317,13 @@ class MapPage extends Component {
 
     //build source with coordinates by using arc
     //create line features
+
     var flightsSource = new VectorSource({
       wrapX: false,
       attributions: 'Flight data by ' +
         '<a href="http://openflights.org/data.html">OpenFlights</a>,',
       loader: function() {
-        var flightsData = testJson;
+       var flightsData = JSON.parse(localStorage.getItem("the_main_map"));
         var CityData = CityJson;
         for (var i = 0; i < flightsData.length; i++) {
 
@@ -363,7 +380,7 @@ class MapPage extends Component {
           }
         }
         map.on('postcompose', animateFlights());
-      },
+      }
     });
 
     // add delay
