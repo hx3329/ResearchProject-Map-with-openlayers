@@ -60,12 +60,12 @@ class DesktopContainer extends Component {
                            to='/'>
                   Home
                 </Menu.Item>
-                <Menu.Item name='work'
-                           active={activeItem === 'work'}
+                <Menu.Item name='map'
+                           active={activeItem === 'map'}
                            onClick={this.handleItemClick}
                            as={Link}
-                           to='/work'>
-                  Work
+                           to='/map'>
+                  Map
                 </Menu.Item>
                 <Menu.Item name='about' active={activeItem === 'about'}
                            onClick={this.handleItemClick}

@@ -38,17 +38,17 @@ class App extends React.Component{
     return(
       <Router>
         <Layout>
-          <Switch>
-            <Route exact path="/" component={Home}/>
-            <Route path="/about" component={About}/>
-            <Route path="/login" component={Signin} />
-            <Route path="/signup" component={Register}/>
-            <Route path="/work" component={Work}/>
-            <Route path="/map" component={MapPage}/>
-            <PrivateRoute path="/group" component={Group}/>
-            <Route component={NotFound}/>
-          </Switch>
-        </Layout>
+            <Switch>
+                <Route exact path="/" component={Home}/>
+                <Route path="/about" component={About}/>
+                <Route path="/login" component={Signin} />
+                <Route path="/signup" component={Register}/>
+                <Route path="/work" component={Work}/>
+                <Route path="/map" component={MapPage}/>
+                <PrivateRoute path="/group" component={Group}/>
+                <Route component={NotFound}/>
+            </Switch>
+          </Layout>
       </Router>
     );
   }

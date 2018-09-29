@@ -1,6 +1,7 @@
 import {Button, Container, Header, Icon, Segment,Responsive,Grid,Image,List,Divider} from "semantic-ui-react";
 import PropTypes from "prop-types";
 import React from "react";
+import {Link} from "react-router-dom";
 /*
 * Heads up! HomepageHeading uses inline styling
 * */
@@ -15,7 +16,7 @@ const HomepageHeading = ({ mobile }) => (
       <Container text>
         <Header
           as='h1'
-          content='findgroup-APstorm'
+          content='Flights Data Visualization App'
           inverted
           style={{
             fontSize: mobile ? '2em' : '4em',
@@ -26,7 +27,7 @@ const HomepageHeading = ({ mobile }) => (
         />
         <Header
           as='h2'
-          content='Do you want to find group?'
+          content='Do you want to view flights data in a map?'
           inverted
           style={{
             fontSize: mobile ? '1.5em' : '1.7em',
@@ -34,7 +35,7 @@ const HomepageHeading = ({ mobile }) => (
             marginTop: mobile ? '0.5em' : '1.5em',
           }}
         />
-        <Button primary size='huge'>
+        <Button as={Link} to='/map' primary size='huge'>
           Get Started
           <Icon name='right arrow' />
         </Button>
@@ -129,6 +130,7 @@ const HomepageHeading = ({ mobile }) => (
       </Container>
     </Segment>
   </Responsive>
+
 
 )
 

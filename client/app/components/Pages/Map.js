@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import {Map, View,Feature} from 'ol';
+import 'openlayers/css/ol.css';
 import TileLayer from "ol/layer/Tile";
 import BingMaps from "ol/source/BingMaps";
 import {fromLonLat} from 'ol/proj.js';
@@ -12,45 +13,59 @@ import LineString from 'ol/geom/LineString.js';
 import Point from "ol/geom/Point";
 import {Stroke, Style, Fill,Text} from 'ol/style.js';
 import VectorSource from 'ol/source/Vector.js';
-import testJson from './test';
-import CityJson from './City';
+// import testJson from '../../utils/test';
+import CityJson from '../../utils/City';
 import Icon from "ol/style/Icon";
+import FullScreen from "ol/control/FullScreen";
+import Attribution from "ol/control/Attribution";
+import ScaleLine from "ol/control/ScaleLine";
+import {Button, Dropdown} from 'semantic-ui-react';
+import * as turf from "turf";
 
-//Calculate great circles routes as lines in GeoJSON or WKT format.
-var arc = require('arc');
 
-const styles = [
+var styles = [
   'Road',
   'RoadOnDemand',
   'Aerial',
   'AerialWithLabels'
 ];
 
+const options = [
+  {
+    text: 'Road (static)',
+    value: 'Road'
+  },
+
+  {
+    text: 'Road (dynamic)',
+    value: 'RoadOnDemand'
+  },
+
+  {
+    text: 'Aerial',
+    value: 'Aerial'
+  },
+
+  {
+    text: 'Aerial with labels',
+    value: 'AerialWithLabels'
+  }
+]
+
 //location
-const london = fromLonLat([-0.12755, 51.507222]);
+var london = fromLonLat([-0.12755, 51.507222]);
 // var moscow = fromLonLat([37.6178, 55.7517]);
 // var istanbul = fromLonLat([28.9744, 41.0128]);
-const rome = fromLonLat([12.5, 41.9]);
+var rome = fromLonLat([12.5, 41.9]);
 // var bern = fromLonLat([7.4458, 46.95]);
-const sydeney = fromLonLat([151.207859,-33.861568]);
+var sydeney = fromLonLat([151.207859,-33.861568]);
+
+//Calculate great circles routes as lines in GeoJSON or WKT format.
+var arc = require('arc');
 
 
-
-// text style
-const labelStyle = new Style({
-  text: new Text({
-    font: 'bold 11px "Open Sans", "Arial Unicode MS", "sans-serif"',
-    placement: 'line',
-    textBaseline: 'bottom',
-    fill: new Fill({
-      color: 'white'
-    })
-  })
-});
-
-
-// line style
 var style = null;
+
 const findstyle = (e)  => {
   switch(e){
     default:case "A":
@@ -94,7 +109,21 @@ const findstyle = (e)  => {
   return style;
 }
 
-//find plane svg path with style
+// var headInnerImageStyle = new Style({
+//     image: new CircleStyle({
+//         radius: 2,
+//         fill: new Fill({color: 'blue'})
+//     })
+// });
+//
+// var headOuterImageStyle = new Style({
+//     image: new CircleStyle({
+//         radius: 5,
+//         fill: new Fill({color: 'black'})
+//     })
+// });
+
+
 var plane;
 const findPlane =(e) =>{
   switch(e) {
@@ -141,23 +170,19 @@ const findPlane =(e) =>{
         "\tc6.551,0,11.861,12.255,11.861,18.805C105.829,27.805,105.745,29.523,105.584,32.711z";
       break;
     case "A320-232":
-      plane = "M183.663,100.906c0-1.92,0.007-3.795,0.014-5.608c0.057-15.114-0.024-21.903-2.551-24.439c-1.419-1.424-3.771-1.424-5.189,0\n" +
-        "\tc-1.886,1.893-2.409,6.158-2.53,14.48l-13.847-2.199c-0.633-9.547-3.529-9.555-4.558-9.555c-0.975,0-3.628,0.002-4.443,8.126\n" +
-        "\tl-11.529-1.831c-0.54-10.21-3.547-10.213-4.599-10.213c-1,0-3.763,0.008-4.5,8.768l-8.785-1.395V68.5c0-2.481-2.019-4.5-4.5-4.5\n" +
-        "\th-0.783c0.268-7.3,0.396-11.87,0.399-12.015C116.261,47.586,111.997,0,98.479,0h-0.537C84.424,0,80.161,47.586,80.162,52.055\n" +
-        "\tc0.003,0.118,0.131,4.669,0.398,11.954c-2.442,0.046-4.415,2.039-4.415,4.491v8.4l-10.75,1.703\n" +
-        "\tc-0.714-8.932-3.508-8.937-4.515-8.937c-1.058,0-4.09,0.007-4.607,10.383l-11.506,1.823c-0.795-8.284-3.476-8.288-4.458-8.288\n" +
-        "\tc-1.035,0-3.958,0.009-4.569,9.719L22.883,85.34c-0.121-8.323-0.644-12.589-2.53-14.481c-1.419-1.424-3.771-1.424-5.189,0\n" +
-        "\tc-2.527,2.536-2.608,9.325-2.551,24.439c0.007,1.813,0.014,3.688,0.014,5.608s-0.007,3.795-0.014,5.608\n" +
-        "\tc-0.057,15.114,0.024,21.903,2.551,24.439c0.709,0.712,1.631,1.104,2.595,1.104s1.885-0.393,2.595-1.104\n" +
-        "\tc1.844-1.851,2.384-5.987,2.52-13.954h60.37c1.173,17.299,2.494,31.173,3.932,41.242c0.037,0.259,0.074,0.505,0.111,0.758h-1.729\n" +
-        "\tc-1.125,0-2.659,0.425-3.583,1.611L70.32,175.485c-0.74,0.947-1.15,2.377-1.021,3.558l1.578,14.511\n" +
-        "\tc0.173,1.585,1.379,2.735,2.868,2.735c0.801,0,1.583-0.342,2.202-0.963l12.491-12.517c0.028-0.015,0.065-0.03,0.096-0.04\n" +
-        "\tl18.218-0.055c0.027,0.01,0.061,0.023,0.087,0.036l12.594,12.571c0.617,0.616,1.396,0.955,2.194,0.956h0\n" +
-        "\tc1.492,0,2.7-1.153,2.873-2.743l1.578-14.528c0.128-1.181-0.273-2.563-1.025-3.525l-11.647-14.864\n" +
-        "\tc-0.929-1.192-2.462-1.617-3.588-1.617h-0.683c0.037-0.253,0.074-0.499,0.111-0.758c1.438-10.069,2.759-23.943,3.931-41.242h60.238\n" +
-        "\tc0.136,7.967,0.675,12.103,2.52,13.954c0.709,0.712,1.631,1.104,2.595,1.104s1.885-0.393,2.595-1.104\n" +
-        "\tc2.527-2.536,2.608-9.325,2.551-24.439C183.669,104.701,183.663,102.826,183.663,100.906z";
+      plane = "M171.485,104.327l-26.04-19.089c1.138-1.565,1.821-3.483,1.821-5.561c0-5.23-4.254-9.485-9.484-9.485\n" +
+        "\tc-2.591,0-4.941,1.047-6.654,2.737c0.655-1.288,1.032-2.74,1.032-4.281c0-5.23-4.255-9.485-9.486-9.485\n" +
+        "\tc-3.105,0-5.685,1.507-7.417,3.82l-10.151-7.566V23.962c0-4.575-4.23-23.962-12-23.962s-12,19.387-12,23.962v31.454L70.39,63.397\n" +
+        "\tc-1.702-2.55-4.517-4.235-7.807-4.235c-5.23,0-9.443,4.255-9.443,9.485c0,1.541,0.399,2.993,1.054,4.281\n" +
+        "\tc-1.714-1.69-4.053-2.737-6.644-2.737c-5.23,0-9.48,4.255-9.48,9.485c0,2.262,0.801,4.341,2.128,5.973l-25.47,18.677\n" +
+        "\tc-1.527,1.12-2.621,3.307-2.621,5.199v13.6c0,2.167,1.522,3.802,3.56,3.802c0.615,0,1.224-0.149,1.821-0.444l49.016-23.963\n" +
+        "\tc0.641-0.316,1.968-0.396,2.683-0.396h11.921v56.479c0,0.013,0.176,0.032,0.176,0.046c-0.143,0.146-0.19,0.293-0.302,0.437\n" +
+        "\tl-7.97,10.375c-0.733,0.938-1.131,2.437-1,3.641l1.083,9.896c0.172,1.594,1.388,2.751,2.883,2.751c0.799,0,1.58-0.339,2.193-0.954\n" +
+        "\tl8.554-8.597c0.028-0.014,0.065-0.074,0.095-0.074h0.024c3.404,10,4.507,10.089,6.263,10.089c1.781,0,2.896-0.461,6.287-10.02\n" +
+        "\tl8.567,8.609c0.617,0.616,1.147,0.96,2.147,0.961v0.002c2,0,2.748-1.152,2.921-2.742l1.096-9.872\n" +
+        "\tc0.131-1.212-0.287-2.763-1.002-3.68l-8.022-10.394c-0.102-0.131-0.045-0.264-0.174-0.397c0.001-0.024,0.181-0.054,0.181-0.075\n" +
+        "\tv-56.479h11.921c0.715,0,2.045,0.079,2.687,0.396l49.017,24.077c0.598,0.296,1.2,0.387,1.815,0.387c2.037,0,3.56-1.693,3.56-3.86\n" +
+        "\tv-13.6C174.107,107.634,173.012,105.447,171.485,104.327z";
       break;
     case "A320-242":
       plane = "M170.122,81.41L142.5,72.415V65.5c0-3.584-2.916-6.5-6.5-6.5h-6c-3.584,0-6.5,2.916-6.5,6.5v0.727l-16.938-5.516\n" +
@@ -185,41 +210,27 @@ const findPlane =(e) =>{
         "\tc0.477,0.171,0.922,0.285,1.403,0.285c2.157,0,3.743-1.664,3.743-3.908v-8.458C169.902,101.604,168.64,99.441,166.845,98.491z";
       break;
     case "B717-200":
-      plane = "M189.547,59.563l-4.936,0.113c0.079-0.607,0.126-1.231,0.126-1.873c0-0.977-0.102-1.914-0.281-2.803H185\n" +
-        "\tc1.381,0,2.5-1.119,2.5-2.5S186.381,50,185,50h-2.867c-1.291-1.497-2.969-2.395-4.83-2.395s-3.539,0.897-4.83,2.395H170\n" +
-        "\tc-1.381,0-2.5,1.119-2.5,2.5s1.119,2.5,2.5,2.5h0.15c-0.179,0.889-0.281,1.826-0.281,2.803c0,0.76,0.062,1.496,0.171,2.205\n" +
-        "\tl-9.514,0.217c0.133-0.775,0.211-1.583,0.211-2.422c0-0.977-0.102-1.914-0.281-2.803H161c1.381,0,2.5-1.119,2.5-2.5\n" +
-        "\tS162.381,50,161,50h-2.867c-1.291-1.497-2.969-2.395-4.83-2.395s-3.539,0.897-4.83,2.395H146c-1.381,0-2.5,1.119-2.5,2.5\n" +
-        "\ts1.119,2.5,2.5,2.5h0.15c-0.179,0.889-0.281,1.826-0.281,2.803c0,0.958,0.099,1.877,0.271,2.75l-9.715,0.221\n" +
-        "\tc0.201-0.937,0.312-1.933,0.312-2.971c0-0.977-0.102-1.914-0.281-2.803H137c1.381,0,2.5-1.119,2.5-2.5S138.381,50,137,50h-2.867\n" +
-        "\tc-1.291-1.497-2.969-2.395-4.83-2.395s-3.539,0.897-4.83,2.395H122c-1.381,0-2.5,1.119-2.5,2.5s1.119,2.5,2.5,2.5h0.15\n" +
-        "\tc-0.179,0.889-0.281,1.826-0.281,2.803c0,1.159,0.14,2.263,0.389,3.294l-8.472,0.193c0.971-17.017,1.524-28.885,1.534-29.098\n" +
-        "\tl0.002-0.115c0-9.861-7.646-28.076-18.54-28.076H96.29C85.396,4,77.75,22.215,77.75,32.076l0.002,0.115\n" +
-        "\tc0.01,0.214,0.562,12.071,1.533,29.077l-8.929-0.203c0.244-1.021,0.381-2.115,0.381-3.262c0-0.977-0.102-1.914-0.281-2.803H71\n" +
-        "\tc1.381,0,2.5-1.119,2.5-2.5S72.381,50,71,50h-2.867c-1.291-1.497-2.969-2.395-4.83-2.395s-3.539,0.897-4.83,2.395H56\n" +
-        "\tc-1.381,0-2.5,1.119-2.5,2.5S54.619,55,56,55h0.15c-0.179,0.889-0.281,1.826-0.281,2.803c0,1.027,0.109,2.011,0.306,2.939\n" +
-        "\tl-9.703-0.221c0.168-0.864,0.265-1.772,0.265-2.718c0-0.977-0.102-1.914-0.281-2.803H47c1.381,0,2.5-1.119,2.5-2.5S48.381,50,47,50\n" +
-        "\th-2.867c-1.291-1.497-2.969-2.395-4.83-2.395s-3.539,0.897-4.83,2.395H32c-1.381,0-2.5,1.119-2.5,2.5S30.619,55,32,55h0.15\n" +
-        "\tc-0.179,0.889-0.281,1.826-0.281,2.803c0,0.827,0.076,1.624,0.205,2.39l-9.503-0.217c0.107-0.699,0.166-1.425,0.166-2.173\n" +
-        "\tc0-0.977-0.102-1.914-0.281-2.803H23c1.381,0,2.5-1.119,2.5-2.5S24.381,50,23,50h-2.867c-1.291-1.497-2.969-2.395-4.83-2.395\n" +
-        "\ts-3.539,0.897-4.83,2.395H8c-1.381,0-2.5,1.119-2.5,2.5S6.619,55,8,55h0.15c-0.179,0.889-0.281,1.826-0.281,2.803\n" +
-        "\tc0,0.631,0.046,1.244,0.123,1.841l-3.434-0.078l-0.104-0.002C1.998,59.563,0,61.563,0,64.019v11.503c0,2.372,1.715,4.425,3.99,4.774\n" +
-        "\tl77.203,11.818c0.393,5.867,0.815,11.87,1.262,17.86c1.194,15.975,2.403,29.649,3.611,40.87l-23.2,18.878\n" +
-        "\tc-0.693,0.565-1.865,1.954-1.865,3.569v7.933c0,1.804,1.543,3.271,3.439,3.271h0c0.312,0,0.62-0.041,0.917-0.122l24.457-6.671\n" +
-        "\tC92.05,188.875,94.044,190,96.29,190h0.493c2.23,0,4.212-1.104,6.43-12.06l23.683,6.434c0.296,0.081,0.599,0.122,0.899,0.122\n" +
-        "\tc1.798,0,3.206-1.438,3.206-3.271v-7.933c0-1.265-0.715-2.732-1.74-3.569l-22.323-18.237c1.231-11.339,2.464-25.229,3.68-41.511\n" +
-        "\tc0.446-5.968,0.866-11.947,1.258-17.793c0.032,0.001,0.062,0.01,0.095,0.01c0.214,0,0.436-0.016,0.667-0.051l77.374-11.846\n" +
-        "\tc2.274-0.349,3.989-2.401,3.989-4.773V64.019C194,61.563,192.002,59.563,189.547,59.563z M95,24.125c0,0.646-0.501,0.66-0.69,0.692\n" +
-        "\tc-2.839,0.476-5.956,3.285-7.634,7.388c-0.541,1.323-1.569-3.228-1.654-3.97c-0.61-5.281,4.538-15.18,9.346-15.872\n" +
-        "\tC94.536,12.339,95,12.458,95,13.083V24.125z M108.614,28.234c-0.077,1.006-1.147,5.293-1.688,3.97\n" +
-        "\tc-1.704-4.166-4.73-7.03-7.617-7.407C99.164,24.778,99,24.708,99,24.229V13.167c0-0.646,0.301-0.821,0.513-0.783\n" +
-        "\tC104.281,13.231,109.016,22.981,108.614,28.234z";
+      plane = "M94.631,17.869C94.685,17.868,94.577,17.868,94.631,17.869L94.631,17.869z\"/>\n" +
+        "\t<path d=\"M168.399,98.825l-6.204-4.372V83.5c0-3.584-2.916-6.5-6.5-6.5h-6c-2.822,0-5.223,1.811-6.12,4.33l-4.38-3.087V67.5\n" +
+        "\t\tc0-3.584-2.916-6.5-6.5-6.5h-6c-2.76,0-5.117,1.732-6.058,4.164l-7.819-5.511l1.332-21.904l-0.036-0.152\n" +
+        "\t\tc0-8.583-8.292-36.952-19.362-37.585L94.195,0v0.011c-11,0.63-20.165,28.887-20.165,37.585l1.424,22.845l-6.7,4.722\n" +
+        "\t\tC67.813,62.732,65.455,61,62.695,61h-6c-3.584,0-6.5,2.916-6.5,6.5v10.743l-4.38,3.087c-0.896-2.519-3.297-4.33-6.12-4.33h-6\n" +
+        "\t\tc-3.584,0-6.5,2.916-6.5,6.5v10.953l-6.206,4.373c-1.389,0.98-2.794,3.08-2.794,5.196v8.913c0,2.287,1.754,4.079,3.994,4.079\n" +
+        "\t\tc0.347,0,0.699-0.043,1.043-0.128l7.963-1.951v4.792c0,3.584,2.691,6.5,6,6.5s6-2.916,6-6.5v-7.733l11-2.695v0.428\n" +
+        "\t\tc0,3.584,2.691,6.5,6,6.5s6-2.916,6-6.5v-3.368l11.938-2.925l3.259,52.296l-17.844,20.007c-0.673,0.755-1.352,2.103-1.352,3.41\n" +
+        "\t\tv7.127c0,1.748,1.368,3.117,3.115,3.117c0.58,0,1.158-0.157,1.674-0.456l27.711-16.094l27.714,16.095\n" +
+        "\t\tc0.514,0.297,1.091,0.454,1.672,0.454c1.746,0,3.114-1.369,3.114-3.117v-7.127c0-1.308-0.68-2.656-1.354-3.411l-18.801-21.08\n" +
+        "\t\tl3.131-51.488l13.024,3.191v3.368c0,3.584,2.691,6.5,6,6.5s6-2.916,6-6.5v-0.428l11,2.695v7.733c0,3.584,2.691,6.5,6,6.5\n" +
+        "\t\ts6-2.916,6-6.5v-4.792l7.961,1.951c0.347,0.085,0.698,0.128,1.046,0.128c2.239,0,3.993-1.792,3.993-4.079v-8.913\n" +
+        "\t\tC171.195,101.907,169.79,99.807,168.399,98.825z M94.794,10.061c-0.054,0-0.109,0.006-0.163,0.008\n" +
+        "\t\tc-0.054-0.001-0.108-0.008-0.162-0.008H94.794z M108.608,37.663c0,0-0.21,0.522-0.336,0.065\n" +
+        "\t\tc-1.638-5.964-7.523-19.721-13.642-19.859c-6.128,0.138-12.63,13.9-14.457,19.863c-0.15,0.491-0.393-0.131-0.393-0.131\n" +
+        "\t\tl-0.115-4.522c0-5.883,7.745-22.805,14.964-22.967c7.207,0.163,14.093,17.15,14.093,23.033L108.608,37.663z";
       break;
   }
   return plane;
 }
 
-// engine style
 var col;
 const findEngine = (e) => {
   switch(e){
@@ -240,22 +251,32 @@ const findEngine = (e) => {
 }
 
 
-
-// configure map center of view to Sydney with its coordinates
 const view = new View({
   center: fromLonLat([134.027715,-26.029331]),
   zoom:4.5
 });
 
-class MapPage extends Component {
+
+var layers = [];
+
+var p = [
+  'A330-203',
+  'B737-3B7',
+  'A320-232',
+  'B737-476',
+  'A320-242',
+  'B717-200',
+  'A737-3B7'
+]
+
+class App extends Component {
   constructor(props){
     super(props);
-    this.state = {
+    this.state={
       selectStyle:'AerialWithLabels',
-      airlines:[]
-    };
+      options:options
+    }
   }
-
 
   componentDidMount(){
     //get map airlines
@@ -269,7 +290,6 @@ class MapPage extends Component {
       });
 
     //select map of bind
-    var layers = [];
     for (var i = 0; i < styles.length; i++) {
       layers.push(new TileLayer({
         visible: styles[i] === this.state.selectStyle,
@@ -298,12 +318,26 @@ class MapPage extends Component {
       collapsed: false
     });
 
+    var att = new Attribution({
+      className: 'ol-attribution ol-custom-attribution',
+      label:'S',
+      collapsed:false,
+      tipLabel:'Style indicate'
+
+    });
+
     //map layer
     var map = new Map({
-      //add controls with customer small overview map
       controls: defaultControls().extend([
-        overviewMapControl
+        new FullScreen(),
+        overviewMapControl,
+        att,
+        new OverviewMap(),
+        new ScaleLine({
+          units: 'metric'
+        })
       ]),
+
       interactions: defaultInteractions().extend([
         new DragRotateAndZoom()
       ]),
@@ -315,17 +349,144 @@ class MapPage extends Component {
       view: view
     });
 
-    //build source with coordinates by using arc
-    //create line features
+
+    var base ='';
+    for (var z = 0; z<p.length;z++) {
+      if(z%2===0){
+        var str =
+          '<tr>'+
+          '  <th scope="row">'+p[z]+'</th>' +
+          '  <td>' +
+          '     <svg width="50" height="50" viewBox="-100 -50 300 300" version="1.1" xmlns="http://www.w3.org/2000/svg">' +
+          '        <path d="'+findPlane(p[z])+'"/>' +
+          '     </svg>'+
+          '  </td>'+
+          '  <th scope="row">'+p[z+1]+'</th>' +
+          '  <td>' +
+          '     <svg width="50" height="50" viewBox="-100 -50 300 300" version="1.1" xmlns="http://www.w3.org/2000/svg">' +
+          '        <path d="'+findPlane(p[z+1])+'"/>' +
+          '     </svg>'+
+          '  </td>'+
+          '</tr>';
+        base = base + str;
+      }
+    }
+
+    var attribution = '<table class="table table-hover">' +
+      '  <thead>' +
+      '    <tr>' +
+      '      <th scope="col">Class</th>' +
+      '      <th scope="col">LineColor</th>' +
+      '      <th scope="col">Engine</th>' +
+      '      <th scope="col">PlaneColor</th>' +
+      '    </tr>' +
+      '  </thead>' +
+      '  <tbody>' +
+      '    <tr>' +
+      '      <th scope="row">A</th>' +
+      '      <td>' +
+      '        <svg width="50" height="10">\n' +
+      '           <rect width="50" height="10" style="fill:#ea424d" />\n' +
+      '        </svg>' +
+      '      </td>' +
+      '      <th scope="row">CF6-80E142</th>' +
+      '      <td>' +
+      '        <svg width="50" height="10">\n' +
+      '           <rect width="50" height="10" style="fill:#111eae" />\n' +
+      '        </svg>' +
+      '      </td>' +
+      '    </tr>' +
+      '    <tr>' +
+      '      <th scope="row">B</th>' +
+      '      <td>' +
+      '        <svg width="50" height="10">\n' +
+      '           <rect width="50" height="10" style="fill:#e6ea11" />\n' +
+      '        </svg>' +
+      '      </td>' +
+      '      <th scope="row">CFM56-3B1</th>' +
+      '      <td>' +
+      '        <svg width="50" height="10">\n' +
+      '           <rect width="50" height="10" style="fill:#56ae2e" />\n' +
+      '        </svg>' +
+      '      </td>' +
+      '    </tr>' +
+      '    <tr>' +
+      '      <th scope="row">C</th>' +
+      '      <td>' +
+      '        <svg width="50" height="10">\n' +
+      '           <rect width="50" height="10" style="fill:#363bea" />\n' +
+      '        </svg>' +
+      '      </td>' +
+      '      <th scope="row">CFM-56-3</th>' +
+      '      <td>' +
+      '        <svg width="50" height="10">\n' +
+      '           <rect width="50" height="10" style="fill:#19ae9a" />\n' +
+      '        </svg>' +
+      '      </td>' +
+      '    </tr>' +
+      '    <tr>' +
+      '      <th scope="row">D</th>' +
+      '      <td>' +
+      '        <svg width="50" height="10">\n' +
+      '           <rect width="50" height="10" style="fill:#be42ea" />\n' +
+      '        </svg>' +
+      '      </td>' +
+      '      <th scope="row">V2527-5A</th>' +
+      '      <td>' +
+      '        <svg width="50" height="10">\n' +
+      '           <rect width="50" height="10" style="fill:#8311ae" />\n' +
+      '        </svg>' +
+      '      </td>' +
+      '    </tr>' +
+      '    <tr>' +
+      '      <th scope="row">E</th>' +
+      '      <td>' +
+      '        <svg width="50" height="10">\n' +
+      '           <rect width="50" height="10" style="fill:#15ea5c" />\n' +
+      '        </svg>' +
+      '      </td>' +
+      '      <th scope="row">772B-60</th>' +
+      '      <td>' +
+      '        <svg width="50" height="10">\n' +
+      '           <rect width="50" height="10" style="fill:#e6ea11" />\n' +
+      '        </svg>' +
+      '      </td>' +
+      '    </tr>' +
+      '    <tr>' +
+      '      <th scope="row"></th>' +
+      '      <td></td>' +
+      '      <th scope="row">Unknown</th>' +
+      '      <td>' +
+      '        <svg width="50" height="10">\n' +
+      '           <rect width="50" height="10" style="fill:#ae0b08" />\n' +
+      '        </svg>' +
+      '      </td>' +
+      '    </tr>' +
+      '  </tbody>' +
+      '  <thead>' +
+      '    <tr>' +
+      '      <th scope="col">AircraftModel</th>' +
+      '      <th scope="col">PlaneStyle</th>' +
+      '      <th scope="col">AircraftModel</th>' +
+      '      <th scope="col">PlaneStyle</th>' +
+      '    </tr>' +
+      '  </thead>' +
+      '  <tbody>' +
+      base +
+      '  </tbody>' +
+      '</table>';
 
     var flightsSource = new VectorSource({
       wrapX: false,
-      attributions: 'Flight data by ' +
-        '<a href="http://openflights.org/data.html">OpenFlights</a>,',
+      attributions: attribution,
       loader: function() {
-       var flightsData = JSON.parse(localStorage.getItem("the_main_map"));
+        // var flightsData = flightJson.flights;
+        var flightsData = JSON.parse(localStorage.getItem("the_main_map"));
         var CityData = CityJson;
         for (var i = 0; i < flightsData.length; i++) {
+          // var flight = flightsData[i];
+          // var from = flight[0];
+          // var to = flight[1];
 
           //customerize
           //get Class name
@@ -340,6 +501,7 @@ class MapPage extends Component {
           //get EngineModel
           var EngineModel = flightsData[i].EngineModel;
 
+
           // console.log(AirSpaceClass);
           for(var j = 0; j< CityData.length; j++){
             if(CityData[j].CityName === flightsData[i].From_City){
@@ -350,18 +512,28 @@ class MapPage extends Component {
             }
           }
 
+          // create bezir curve
+          var linestring = turf.lineString([
+            [from[1], from[0]],
+            [from[1]+0.5,to[0]-0.3],
+            [to[1], to[0]]
+          ])
+
+          var bezier = turf.bezier(linestring);
+
           // create an arc circle between the two locations
           var arcGenerator = new arc.GreatCircle(
             {x: from[1], y: from[0]},
             {x: to[1], y: to[0]},{'name': 'Seattle to DC'});
 
-          //build 500 coordinates by using arc
           var arcLine = arcGenerator.Arc(500, {offset: 10});
           if (arcLine.geometries.length === 1) {
-            var line = new LineString(arcLine.geometries[0].coords);
+            // var line = new LineString(arcLine.geometries[0].coords);
+            var line = new LineString(bezier.geometry.coordinates);
+            // var point =  new Point(arcLine.geometries[0].coords[0]);
             line.transform('EPSG:4326', 'EPSG:3857');
+            // point.transform('EPSG:4326', 'EPSG:3857');
 
-            //create line features
             var feature = new Feature({
               type:LineString,
               geometry: line,
@@ -377,10 +549,12 @@ class MapPage extends Component {
             // add the feature with a delay so that the animation
             // for all features does not start at the same time
             addLater(feature, i * 500);
+            // addLater(pointFeature,i * 500)
+            // addLater(featurePoint,i * 500);
           }
         }
-        map.on('postcompose', animateFlights());
-      }
+        map.on('postcompose', animateFlights);
+      },
     });
 
     // add delay
@@ -391,87 +565,74 @@ class MapPage extends Component {
       }, timeout);
     }
 
-    //build action to map postcompose
+    var vectorContext;
     var pointsPerMs = 0.1;
     //第二次生成出来接event的function
-    const animateFlights = (styles) => (event) => {
-
-      var vectorContext = event.vectorContext;
+    // const animateFlights = (styles) => (event) => {
+    function animateFlights(event) {
+      vectorContext = event.vectorContext;
       var frameState = event.frameState;
       var features = flightsSource.getFeatures();
 
       for (var i = 0; i < features.length; i++) {
         var feature = features[i];
         var coords = feature.getGeometry().getCoordinates();
+        // if(feature.get('type') === LineString){
         if (!feature.get('finished')) {
 
           // only draw the lines for which the animation has not finished yet
           var elapsedTime = frameState.time - feature.get('start');
           var elapsedPoints = elapsedTime * pointsPerMs;
+          // console.log(elapsedPoints);
 
-          //identify the line moving index
-          var maxIndex = Math.min(elapsedPoints, coords.length);
-          //build line from 0 to maxindex
-          var currentLine = new LineString(coords.slice(0, maxIndex));
-
-          // directly draw the line with the vector context
-
-          //get class value
-          var airClass = feature.get("AirSpaceClass");
-
-          //use findstyle to find line style with class
-          var lineStyle = findstyle(airClass);
-          vectorContext.setStyle(lineStyle);
-
-          //draw line
-          vectorContext.drawGeometry(currentLine);
-
-
-          //movepoint
-          // var index = Math.round(maxIndex); // point moving with line
-          // identify index which is different with maxIndex, to make move point with asynchronization
           var index = Math.round(10 * elapsedTime / 1000);
           if (index >= coords.length-2) {
             feature.set('finished', true);
           }
+          var maxIndex = Math.min(elapsedPoints, coords.length);
+          var currentLine = new LineString(coords.slice(0, maxIndex));
+          // directly draw the line with the vector context
+          var airClass = feature.get("AirSpaceClass");
+          var style = findstyle(airClass);
+          vectorContext.setStyle(style);
+          vectorContext.drawGeometry(currentLine);
 
-          // build movepoint at index of coordinates
-          var currentPoint = new Point(coords[index]);
+          //movepoint
+          // var index = Math.round(maxIndex); // point moving with line
+          if(index<500){
+            var currentPoint = new Point(coords[index]);
+            var airEngine = feature.get("EngineModel");
+            var airPlane =  feature.get("AircraftModel");
 
-          //get engine and plane value
-          var airEngine = feature.get("EngineModel");
-          var airPlane =  feature.get("AircraftModel");
+            var plane = findPlane(airPlane);
 
-          //use findPlane and findEngine to find the icon style with engine and plane
-          plane = findPlane(airPlane);
-          col = findEngine(airEngine);
 
-          //use plane and col to identify svg string
-          var svg = '<svg fill="'+col+'" width="200" height="200" version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="'+plane+'"/></svg>';
-          var mysvg = new Image();
-          mysvg.src = 'data:image/svg+xml,' + escape(svg);
+            col = findEngine(airEngine);
+            var svg = '<svg fill="'+col+'" width="200" height="200" version="1.1" xmlns="http://www.w3.org/2000/svg"><' +
+              'path d="'+plane+'"/></svg>';
 
-          //and then declare your style with img and imgSize
-          var planeStyle = new Style({
-            image: new Icon({
-              opacity: 1,
-              img: mysvg,
-              imgSize:[170,170],
-              scale: 0.2,
-              //use planeRoation to control plane icon direction
-              rotation:planeRoation(coords[i+1],coords[i])
-            })
-          });
+            var mysvg = new Image();
+            mysvg.src = 'data:image/svg+xml,' + escape(svg);
 
-          // draw the movepoint with the vector context
-          //add plane style
-          vectorContext.setStyle(planeStyle);
+            //and then declare your style with img and imgSize
+            var planeStyle = new Style({
+              image: new Icon({
+                opacity: 1,
+                // anchor:[0.5,0.5],
+                img: mysvg,
+                imgSize:[170,170],
+                scale: 0.2,
+                rotation:planeRoation(coords[i+1],coords[i])
+              })
+            });
 
-          //draw move point with icon
-          vectorContext.drawGeometry(currentPoint);
+
+            // draw the movepoint with the vector context
+            vectorContext.setStyle(planeStyle);
+            vectorContext.drawGeometry(currentPoint);
+          }
         }
       }
-
       // tell OpenLayers to continue the animation
       map.render();
     }
@@ -486,37 +647,218 @@ class MapPage extends Component {
       return pi_90 - pi_ac;
     }
 
-    //build flightlayer with source
-    var textString ='';
+    //change price color based on map types
+    const findcolor = (e) =>{
+      switch(e){
+        default:case "Road":
+        return "black";
+        case "RoadOnDemand":
+          return "black";
+        case "AerialWithLabels":
+          return "white";
+        case "Aerial":
+          return "white";
+      }
+    }
+
+    var animating =true;
+    var self= this;
     var flightsLayer = new VectorLayer({
       source: flightsSource,
       style: function(feature) {
-
-        //show text with price above the line
-        textString ='$'+feature.get('Price');
-        labelStyle.getText().setText(textString);
-
+        var labelStyle = new Style({
+          text: new Text({
+            font: 'bold 11px "Open Sans", "Arial Unicode MS", "sans-serif"',
+            placement: 'line',
+            textBaseline: 'bottom',
+            fill: new Fill({
+              color: findcolor(self.state.selectStyle)
+            })
+          })
+        });
         // if the animation is still active for a feature, do not
         // render the feature with the layer style
-        if (feature.get('finished')) {
-
-          return findstyle(feature.get("AirSpaceClass"));
-        } else {
-
-          return labelStyle;
+        if(animating){
+          labelStyle.getText().setText("$"+feature.get('Price'));
+          if (feature.get('finished')) {
+            // console.log(feature.get("AirSpaceClass"));
+            return findstyle(feature.get("AirSpaceClass"));
+          } else {
+            return labelStyle;
+          }
+        }else{
+          return null;
         }
       }
     });
 
-    //add layer to map
+    //add icons at point in new layer example
+
+    // var lat = -33.861568;
+    // var lng = 151.207859;
+    // var iconFeature =  new Feature ({
+    //     geometry: new Point(transform([lng, lat], 'EPSG:4326', 'EPSG:3857')),
+    //     name: 'The icon',
+    //     population: 4000,
+    //     rainfall: 500
+    // });
+
+    // var svgStyle = new Style({
+    //     image: new Icon({
+    //         opacity: 1,
+    //         src: 'data:image/svg+xml;utf8,' + svg,
+    //         scale: 0.2
+    //     })
+    // });
+
+
+    // iconFeature.setStyle(iconStyle);
+    //
+    // var vectorSource = new VectorSource({
+    //     features: [iconFeature]
+    // });
+    // var vectorLayer = new VectorLayer({
+    //     source: vectorSource
+    // });
+    //
+    //
+    // map.addLayer(vectorLayer);
+
+
     map.addLayer(flightsLayer);
+
+      var container = document.getElementById('map');
+
+      var radius = 75;
+      document.addEventListener('keydown', function(evt) {
+        if (evt.which === 38) {
+          radius = Math.min(radius + 5, 150);
+          map.render();
+          evt.preventDefault();
+        } else if (evt.which === 40) {
+          radius = Math.max(radius - 5, 25);
+          map.render();
+          evt.preventDefault();
+        }
+      });
+
+      // get the pixel position with every move
+      var mousePosition = null;
+
+      container.addEventListener('mousemove', function(event) {
+        mousePosition = map.getEventPixel(event);
+        map.render();
+      });
+
+      container.addEventListener('mouseout', function() {
+        mousePosition = null;
+        map.render();
+      });
+
+      function modifyFunction(event){
+        if (mousePosition) {
+          var context = event.context;
+          var pixelRatio = event.frameState.pixelRatio;
+          var half = radius * pixelRatio;
+          var centerX = mousePosition[0] * pixelRatio;
+          var centerY = mousePosition[1] * pixelRatio;
+          var originX = centerX - half;
+          var originY = centerY - half;
+          var size = 2 * half + 1;
+          var sourceData = context.getImageData(originX, originY, size, size).data;
+          var dest = context.createImageData(size, size);
+          var destData = dest.data;
+          for (var j = 0; j < size; ++j) {
+            for (var i = 0; i < size; ++i) {
+              var dI = i - half;
+              var dJ = j - half;
+              var dist = Math.sqrt(dI * dI + dJ * dJ);
+              var sourceI = i;
+              var sourceJ = j;
+              if (dist < half) {
+                sourceI = Math.round(half + dI / 2);
+                sourceJ = Math.round(half + dJ / 2);
+              }
+              var destOffset = (j * size + i) * 4;
+              var sourceOffset = (sourceJ * size + sourceI) * 4;
+              destData[destOffset] = sourceData[sourceOffset];
+              destData[destOffset + 1] = sourceData[sourceOffset + 1];
+              destData[destOffset + 2] = sourceData[sourceOffset + 2];
+              destData[destOffset + 3] = sourceData[sourceOffset + 3];
+            }
+          }
+          context.beginPath();
+          context.arc(centerX, centerY, half, 0, 2 * Math.PI);
+          context.lineWidth = 3 * pixelRatio;
+          context.strokeStyle = 'rgba(255,255,255,0.5)';
+          context.putImageData(dest, originX, originY);
+          context.stroke();
+          context.restore();
+        }
+      }
+
+    //modify and unmodify button
+    var modify = false;
+    var modifyButton = document.getElementById('modify');
+
+    function stopModify(){
+      modify = false;
+      modifyButton.textContent = 'Modify On';
+      flightsLayer.un('postcompose', modifyFunction);
+    }
+
+    modifyButton.addEventListener('click', function(){
+      if(modify){
+        stopModify();
+      }else {
+        modify = true;
+        modifyButton.textContent = 'Modify Off';
+
+        // after rendering the layer, show an oversampled version around the pointer
+        flightsLayer.on('postcompose', modifyFunction);
+        map.render();
+      }
+    },true);
+
+    //show and hide button
+    var startButton = document.getElementById('start');
+    function stopAnimation() {
+      animating = false;
+      startButton.textContent = 'Show';
+
+      //remove listener
+      map.un('postcompose', animateFlights);
+
+    }
+
+    startButton.addEventListener('click', function(){
+      if(animating){
+        stopAnimation();
+      }else{
+        console.log(vectorContext);
+        animating = true;
+        startButton.textContent = 'Hide';
+        map.on('postcompose', animateFlights);
+        map.render();
+      }
+    },true);
+
   };
-  //chose bind map style
-  onChange = (e) => {
-    var style = e.target.value;
-    this.setState({selectStyle:style});
-    for (var i = 0, ii = layers.length; i < ii; ++i) {
-      layers[i].setVisible(styles[i] === style);
+
+
+
+  // onChange = (e) => {
+  //     var style = e.target.value;
+  //     this.setState({selectStyle:style});
+  //     for (var i = 0; i<layers.length; i++) {
+  //         layers[i].setVisible(styles[i] === style);
+  //     }
+  // };
+
+  handleChange = (e, { value }) => {
+    this.setState({ selectStyle: value });
+    for (var i = 0; i<layers.length; i++) {
+      layers[i].setVisible(styles[i] === value);
     }
   };
 
@@ -547,7 +889,6 @@ class MapPage extends Component {
       easing: easeOut
     });
   };
-
   //pan
   onPanto=()=>{
     view.animate({
@@ -555,11 +896,10 @@ class MapPage extends Component {
       duration: 2000
     });
   };
-
   //fly
   flyTo = (location,done) => {
     var duration = 2000;
-    var zoom = view.getZoom();
+    // var zoom = view.getZoom();
     var parts = 2;
     var called = false;
     function callback(complete) {
@@ -590,23 +930,38 @@ class MapPage extends Component {
   };
 
   render(){
+    const { selectStyle } = this.state;
     return(
       <div className = "app">
         <div id='map'/>
-        <select id="layer-select" value={this.state.selectStyle} onChange={this.onChange}>
-          <option value="Aerial">Aerial</option>
-          <option value="AerialWithLabels">Aerial with labels</option>
-          <option value="Road">Road (static)</option>
-          <option value="RoadOnDemand">Road (dynamic)</option>
-        </select>
-        <button id="rotate-left" title="Rotate clockwise" onClick={this.onRotateleft}>↻</button>
-        <button id="rotate-right" title="Rotate counterclockwise" onClick={this.onRotateright}>↺</button>
-        <button id="pan-to-london" onClick={this.onPanto}>Pan to London</button>
-        <button id="fly-to-bern" onClick={this.onFlyto}>Fly to Sydney</button>
-        <button id="rotate-around-rome" onClick={this.onRotateraround}>Rotate around Rome</button>
+        <Button.Group color="teal" id="tool">
+          <Button id="modify">Modify On</Button>
+          <Button id="start">Hide</Button>
+          <Dropdown placeholder='Select Map' value={selectStyle} floating search button options={this.state.options} onChange={this.handleChange}/>
+          <Button animated='vertical' id="rotate-left" title="Rotate clockwise" onClick={this.onRotateleft}>
+            <Button.Content visible>↻</Button.Content>
+            <Button.Content hidden><i className="left arrow icon"></i></Button.Content>
+          </Button>
+          <Button animated='vertical' id="rotate-right" title="Rotate counterclockwise" onClick={this.onRotateright}>
+            <Button.Content visible>↺</Button.Content>
+            <Button.Content hidden><i className="right arrow icon"></i></Button.Content>
+          </Button>
+          <Button animated='vertical' id="pan-to-london" onClick={this.onPanto}>
+            <Button.Content visible>Pan to </Button.Content>
+            <Button.Content hidden>London</Button.Content>
+          </Button>
+          <Button animated='vertical' id="fly-to-Sydney" onClick={this.onFlyto}>
+            <Button.Content visible>Fly to</Button.Content>
+            <Button.Content hidden>Sydney</Button.Content>
+          </Button>
+          <Button animated='vertical' id="rotate-around-rome" onClick={this.onRotateraround}>
+            <Button.Content visible>Rotate around</Button.Content>
+            <Button.Content hidden>Rome</Button.Content>
+          </Button>
+        </Button.Group>
       </div>
     );
   }
 }
 
-export default MapPage;
+export default App;

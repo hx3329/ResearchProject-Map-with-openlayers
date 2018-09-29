@@ -7,6 +7,7 @@ import {
 } from "../../utils/storage";
 import fakeAuth from "./fakeAuth";
 import Redirect from "react-router-dom/es/Redirect";
+import {Link} from "react-router-dom";
 //style
 const Style = {
   margin: '20px',
@@ -162,7 +163,7 @@ class LoginPage extends React.Component{
                     </Button.Content>
                   </Button>
                   <Divider horizontal>Or</Divider>
-                  <Button secondary animated='fade' fluid>
+                  <Button as={Link} to='/signup' secondary animated fluid>
                     <Button.Content visible>Sign-up for a account</Button.Content>
                     <Button.Content hidden>free</Button.Content>
                   </Button>

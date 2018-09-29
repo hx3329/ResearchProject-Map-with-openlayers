@@ -417,3 +417,109 @@ textarea {
   -webkit-appearance: button; /* 1 */
   font: inherit; /* 2 */
 }
+
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  animation: App-logo-spin infinite 20s linear;
+  height: 80px;
+}
+
+.App-header {
+  background-color: #222;
+  height: 150px;
+  padding: 20px;
+  color: white;
+}
+
+.App-title {
+  font-size: 1.5em;
+}
+
+.App-intro {
+  font-size: large;
+}
+
+@keyframes App-logo-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+#map{
+  height:650px;
+}
+.ol-custom-overviewmap,
+.ol-custom-overviewmap.ol-uncollapsible {
+  bottom: auto;
+  left: auto;
+  right: 0;
+  top: 30px;
+}
+
+.ol-custom-overviewmap:not(.ol-collapsed)  {
+  border: 1px solid black;
+}
+
+.ol-custom-overviewmap .ol-overviewmap-map {
+  border: none;
+  width: 300px;
+}
+
+.ol-custom-overviewmap .ol-overviewmap-box {
+  border: 2px solid red;
+}
+
+.ol-custom-overviewmap:not(.ol-collapsed) button{
+  bottom: auto;
+  left: auto;
+  right: 1px;
+  top: 1px;
+}
+
+.ol-rotate {
+  top: 170px;
+  right: 0;
+}
+
+.ol-full-screen{
+  bottom: auto;
+  left: auto;
+  right: 1px;
+  top: 1px;
+}
+
+.ol-custom-attribution{
+  bottom: 40px;
+  left: 7px;
+  right: auto;
+  top: auto;
+}
+
+.ol-attribution{
+  bottom: 40px;
+  left: 7px;
+  right: auto;
+  top: auto;
+}
+
+.ol-attribution:not(.ol-collapsed) {
+  background: rgba(255,255,240,0.8);
+  height:600px;
+}
+
+.ol-scale-line{
+  bottom: 7px;
+  left: 100px;
+  right: auto;
+  top: auto;
+}
+
+#tool {
+  left: 25%;
+  position:absolute;
+}
+
+
+
