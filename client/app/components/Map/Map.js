@@ -274,6 +274,7 @@ class App extends Component {
     super(props);
     this.state={
       selectStyle:'AerialWithLabels',
+      airlines:[],
       options:options
     }
   }
@@ -475,7 +476,6 @@ class App extends Component {
       base +
       '  </tbody>' +
       '</table>';
-
     var flightsSource = new VectorSource({
       wrapX: false,
       attributions: attribution,
@@ -565,12 +565,11 @@ class App extends Component {
       }, timeout);
     }
 
-    var vectorContext;
-    var pointsPerMs = 0.1;
+    const pointsPerMs = 0.1;
     //第二次生成出来接event的function
     // const animateFlights = (styles) => (event) => {
     function animateFlights(event) {
-      vectorContext = event.vectorContext;
+      var vectorContext = event.vectorContext;
       var frameState = event.frameState;
       var features = flightsSource.getFeatures();
 
@@ -835,7 +834,7 @@ class App extends Component {
       if(animating){
         stopAnimation();
       }else{
-        console.log(vectorContext);
+        // console.log(vectorContext);
         animating = true;
         startButton.textContent = 'Hide';
         map.on('postcompose', animateFlights);

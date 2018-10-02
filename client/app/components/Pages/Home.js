@@ -9,6 +9,7 @@ const HomepageHeading = ({ mobile }) => (
   <Responsive>
     <Segment
       inverted
+      color='teal'
       textAlign='center'
       style={{ minHeight: 700, padding: '1em 0em' }}
       vertical
@@ -22,7 +23,7 @@ const HomepageHeading = ({ mobile }) => (
             fontSize: mobile ? '2em' : '4em',
             fontWeight: 'normal',
             marginBottom: 0,
-            marginTop: mobile ? '1.5em' : '3em',
+            marginTop: mobile ? '1em' : '2em',
           }}
         />
         <Header

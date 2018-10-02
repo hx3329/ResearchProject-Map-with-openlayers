@@ -8,8 +8,8 @@ import Group from "../Group/Group";
 import Signin from "../Auth/Signin";
 import Register from "../Auth/Register";
 import NotFound from "./NotFound";
-import Work from "../Pages/Work";
-import MapPage from "../Pages/Map";
+import MapPage from "../Map/Map";
+import DataPage from "../Data/Data";
 
 import fakeAuth from "../Auth/fakeAuth";
 
@@ -43,8 +43,8 @@ class App extends React.Component{
                 <Route path="/about" component={About}/>
                 <Route path="/login" component={Signin} />
                 <Route path="/signup" component={Register}/>
-                <Route path="/work" component={Work}/>
                 <Route path="/map" component={MapPage}/>
+                <Route path="/data" component={DataPage}/>
                 <PrivateRoute path="/group" component={Group}/>
                 <Route component={NotFound}/>
             </Switch>

@@ -29,7 +29,7 @@ class MobileContainer extends Component {
     return (
       <Responsive maxWidth={Responsive.onlyMobile.maxWidth}>
         <Sidebar.Pushable>
-          <Sidebar as={Menu} animation='uncover' inverted vertical visible={sidebarOpened}>
+          <Sidebar as={Menu} animation='uncover' inverted  color='teal' vertical visible={sidebarOpened}>
             <Menu.Item as='a' active>
               Home
             </Menu.Item>
@@ -50,9 +50,10 @@ class MobileContainer extends Component {
               textAlign='center'
               // style={{ minHeight: 350, padding: '1em 0em' }}
               vertical
+              color='teal'
             >
               <Container>
-                <Menu inverted pointing secondary size='large'>
+                <Menu inverted  color='teal' pointing secondary size='large'>
                   <Menu.Item onClick={this.handleToggle}>
                     <Icon name='sidebar' />
                   </Menu.Item>
