@@ -21,23 +21,7 @@ class ConfirmDelete extends Component {
 
   handleSubmit(e) {
 
-    let params = e.target.getAttribute('data-coordID');
-    //
-    // axios({
-    //   method: 'delete',
-    //   responseType: 'json',
-    //   url: `${this.props.server}/api/users/${params}`,
-    // })
-    //   .then((response) => {
-    //     this.handleClose();
-    //     this.props.onUserDeleted(response.data.result);
-    //     this.props.socket.emit('delete', response.data.result);
-    //   })
-    //   .catch((err) => {
-    //     this.handleClose();
-    //     throw err;
-    //   });
-
+    let params = e.target.getAttribute('data-coordid');
     fetch(`${this.props.server}/api/datas/${params}`,{
       method: 'delete',
       responseType: 'json',
@@ -45,7 +29,7 @@ class ConfirmDelete extends Component {
       .then(response => response.json())
       .then(json => {
         this.handleClose();
-        this.props.onUserDeleted(json.result);
+        this.props.onDataDeleted(json.result);
         this.props.socket.emit('delete', json.result);
       })
       .catch((err) => {
@@ -65,10 +49,10 @@ class ConfirmDelete extends Component {
       >
         <Modal.Header>{this.props.headerTitle}</Modal.Header>
         <Modal.Content>
-          <p>Are you sure you want to delete the airline which from <strong>{this.props.user.email}</strong> to <strong>{this.props.user.age}</strong> ?</p>
+          <p>Are you sure you want to delete the airline which from <strong>{this.props.data.email}</strong> to <strong>{this.props.data.age}</strong> ?</p>
         </Modal.Content>
         <Modal.Actions>
-          <Button onClick={this.handleSubmit} data-coordID={this.props.user._id} color='red'>Yes</Button>
+          <Button onClick={this.handleSubmit} data-coordid={this.props.data._id} color='red'>Yes</Button>
           <Button onClick={this.handleClose} color='black'>No</Button>
         </Modal.Actions>
       </Modal>

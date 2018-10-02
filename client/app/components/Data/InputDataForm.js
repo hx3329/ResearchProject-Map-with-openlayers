@@ -31,22 +31,9 @@ class InputDataForm extends Component {
   }
 
   componentDidMount() {
-   // Fill in the form with the appropriate data if user id is provided
-    if (this.props.userID) {
-      // axios.get(`${this.props.server}/api/users/${this.props.userID}`)
-      //   .then((response) => {
-      //     this.setState({
-      //       name: response.data.name,
-      //       email: response.data.email,
-      //       age: (response.data.age === null) ? '' : response.data.age,
-      //       gender: response.data.gender,
-      //     });
-      //   })
-      //   .catch((err) => {
-      //     console.log(err);
-      //   });
-
-      fetch(`${this.props.server}/api/datas/${this.props.userID}`)
+   // Fill in the form with the appropriate data if data id is provided
+    if (this.props.dataID) {
+      fetch(`${this.props.server}/api/datas/${this.props.dataID}`)
         .then(response => response.json())
             .then(json => {
           this.setState({
@@ -81,17 +68,10 @@ class InputDataForm extends Component {
     // Prevent browser refresh
     e.preventDefault();
 
-    // const user = {
-    //   name: this.state.name,
-    //   email: this.state.email,
-    //   age: this.state.age,
-    //   gender: this.state.gender
-    // }
-
-    // Acknowledge that if the user id is provided, we're updating via PUT
+    // Acknowledge that if the data id is provided, we're updating via PUT
     // Otherwise, we're creating a new data via POST
-    const method = this.props.userID ? 'put' : 'post';
-    const params = this.props.userID ? this.props.userID : '';
+    const method = this.props.dataID ? 'put' : 'post';
+    const params = this.props.dataID ? this.props.dataID : '';
 
     let resStatus =null;
     fetch(`${this.props.server}/api/datas/${params}`,{
@@ -122,7 +102,7 @@ class InputDataForm extends Component {
             formSuccessMessage: response.msg
           });
 
-          if (!this.props.userID) {
+          if (!this.props.dataID) {
             this.setState({
               name: '',
               email: '',
@@ -131,11 +111,11 @@ class InputDataForm extends Component {
               AircraftModel:'',
               EngineModel:'',
             });
-            this.props.onUserAdded(response.result);
+            this.props.onDataAdded(response.result);
             this.props.socket.emit('add', response.result);
           }
           else {
-            this.props.onUserUpdated(response.result);
+            this.props.onDataUpdated(response.result);
             this.props.socket.emit('update', response.result);
           }
         }else{
@@ -146,23 +126,8 @@ class InputDataForm extends Component {
         }
       })
       .catch((err) => {
-        // if (err.response) {
-        //   if (err.response.data) {
-        //     this.setState({
-        //       formClassName: 'warning',
-        //       formErrorMessage: err.response.data.msg
-        //     });
-        //   }
-        // }
-        // else {
-        //   this.setState({
-        //     formClassName: 'warning',
-        //     formErrorMessage: 'Something went wrong. ' + err
-        //   });
-        // }
         console.error(err);
       });
-
   }
 
   render() {

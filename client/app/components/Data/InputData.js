@@ -18,9 +18,9 @@ class InputData extends Component {
           <InputDataForm
             buttonSubmitTitle={this.props.buttonSubmitTitle}
             buttonColor={this.props.buttonColor}
-            userID={this.props.userID}
-            onUserAdded={this.props.onUserAdded}
-            onUserUpdated={this.props.onUserUpdated}
+            dataID={this.props.dataID}
+            onDataAdded={this.props.onDataAdded}
+            onDataUpdated={this.props.onDataUpdated}
             server={this.props.server}
             socket={this.props.socket}
           />

@@ -16,43 +16,35 @@ class Data extends Component {
     this.socket = io.connect(this.server);
 
     this.state = {
-      users: [],
-      online: 0
+      datas: [],
+      online:0
     }
 
-    this.fetchUsers = this.fetchUsers.bind(this);
-    this.handleUserAdded = this.handleUserAdded.bind(this);
-    this.handleUserUpdated = this.handleUserUpdated.bind(this);
-    this.handleUserDeleted = this.handleUserDeleted.bind(this);
+    this.fetchDatas = this.fetchDatas.bind(this);
+    this.handleDataAdded = this.handleDataAdded.bind(this);
+    this.handleDataUpdated = this.handleDataUpdated.bind(this);
+    this.handleDataDeleted = this.handleDataDeleted.bind(this);
   }
 
   // Place socket.io code inside here
   componentDidMount() {
 
-    this.fetchUsers();
+    this.fetchDatas();
     this.socket.on('visitor enters', data => this.setState({ online: data }));
     this.socket.on('visitor exits', data => this.setState({ online: data }));
-    this.socket.on('add', data => this.handleUserAdded(data));
-    this.socket.on('update', data => this.handleUserUpdated(data));
-    this.socket.on('delete', data => this.handleUserDeleted(data));
+    this.socket.on('add', data => this.handleDataAdded(data));
+    this.socket.on('update', data => this.handleDataUpdated(data));
+    this.socket.on('delete', data => this.handleDataDeleted(data));
   }
 
   // Fetch data from the back-end
-  fetchUsers() {
-    // axios.get(`${this.server}/api/users/`)
-    //   .then((response) => {
-    //     this.setState({ users: response.data });
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //   });
-
+  fetchDatas() {
     fetch(`${this.server}/api/datas/`)
       .then(response => response.json())
       .then(json => {
         // console.log(json);
         this.setState({
-          users:json
+          datas:json
         });
       })
       .catch((err) => {
@@ -62,37 +54,35 @@ class Data extends Component {
 
   }
 
-  handleUserAdded(user) {
-    let users = this.state.users.slice();
-    users.push(user);
-    this.setState({ users: users });
+  handleDataAdded(data) {
+    let datas = this.state.datas.slice();
+    datas.push(data);
+    this.setState({ datas: datas });
   }
 
-  handleUserUpdated(user) {
-    let users = this.state.users.slice();
-    for (let i = 0, n = users.length; i < n; i++) {
-      if (users[i]._id === user._id) {
-        users[i].name = user.name;
-        users[i].email = user.email;
-        users[i].age = user.age;
-        users[i].gender = user.gender;
-        users[i].AircraftModel = user.AircraftModel;
-        users[i].EngineModel = user.EngineModel;
+  handleDataUpdated(data) {
+    let datas = this.state.datas.slice();
+    for (let i = 0, n = datas.length; i < n; i++) {
+      if (datas[i]._id === data._id) {
+        datas[i].name = data.name;
+        datas[i].email = data.email;
+        datas[i].age = data.age;
+        datas[i].gender = data.gender;
+        datas[i].AircraftModel = data.AircraftModel;
+        datas[i].EngineModel = data.EngineModel;
         break; // Stop this loop, we found it!
       }
     }
-    this.setState({ users: users });
+    this.setState({ datas: datas });
   }
 
-  handleUserDeleted(user) {
-    let users = this.state.users.slice();
-    users = users.filter(u => { return u._id !== user._id; });
-    this.setState({ users: users });
+  handleDataDeleted(data) {
+    let datas = this.state.datas.slice();
+    datas = datas.filter(u => { return u._id !== data._id; });
+    this.setState({ datas: datas });
   }
 
   render() {
-    // console.log(this.state.users);
-
     let online = this.state.online;
     let verb = (online <= 1) ? 'is' : 'are'; // linking verb, if you'd prefer
     let noun = (online <= 1) ? 'person' : 'people';
@@ -103,19 +93,19 @@ class Data extends Component {
         </div>
         <Container style={{padding:20}}>
           <InputData
-            headerTitle='Add User'
+            headerTitle='Add Data'
             buttonTriggerTitle='Add New'
             buttonSubmitTitle='Add'
             buttonColor='green'
-            onUserAdded={this.handleUserAdded}
+            onDataAdded={this.handleDataAdded}
             server={this.server}
             socket={this.socket}
           />
           <em id='online'>{`${online} ${noun} ${verb} online.`}</em>
           <DataTable
-            onUserUpdated={this.handleUserUpdated}
-            onUserDeleted={this.handleUserDeleted}
-            users={this.state.users}
+            onDataUpdated={this.handleDataUpdated}
+            onDataDeleted={this.handleDataDeleted}
+            datas={this.state.datas}
             server={this.server}
             socket={this.socket}
           />

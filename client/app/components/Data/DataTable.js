@@ -8,7 +8,7 @@ class DataTable extends Component {
 
   render() {
 
-    let coords = this.props.users;
+    let coords = this.props.datas;
     console.log(coords);
     coords = coords.map((coord) =>
       <Table.Row key={coord._id}>
@@ -20,21 +20,21 @@ class DataTable extends Component {
         <Table.Cell>{coord.EngineModel}</Table.Cell>
         <Table.Cell>
           <InputData
-            headerTitle='Edit User'
+            headerTitle='Edit Data'
             buttonTriggerTitle='Edit'
             buttonSubmitTitle='Save'
             buttonColor='blue'
-            userID={coord._id}
-            onUserUpdated={this.props.onUserUpdated}
+            dataID={coord._id}
+            onDataUpdated={this.props.onDataUpdated}
             server={this.props.server}
             socket={this.props.socket}
           />
           <ConfirmDelete
-            headerTitle='Delete User'
+            headerTitle='Delete Data'
             buttonTriggerTitle='Delete'
             buttonColor='black'
-            user={coord}
-            onUserDeleted={this.props.onUserDeleted}
+            data={coord}
+            onDataDeleted={this.props.onDataDeleted}
             server={this.props.server}
             socket={this.props.socket}
           />
@@ -42,7 +42,7 @@ class DataTable extends Component {
       </Table.Row>
     );
 
-    // Make every new user appear on top of the list
+    // Make every new data appear on top of the list
     coords =  [...coords].reverse();
 
     return (
