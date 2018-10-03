@@ -56,7 +56,6 @@ class InputDataForm extends Component {
     const target = e.target;
     const value = target.type === 'checkbox' ? target.checked : target.value;
     const name = target.name;
-
     this.setState({ [name]: value });
   }
 
@@ -72,7 +71,6 @@ class InputDataForm extends Component {
     // Otherwise, we're creating a new data via POST
     const method = this.props.dataID ? 'put' : 'post';
     const params = this.props.dataID ? this.props.dataID : '';
-
     let resStatus =null;
     fetch(`${this.props.server}/api/datas/${params}`,{
       method: method,
@@ -91,12 +89,12 @@ class InputDataForm extends Component {
       }),
     })
       .then(response => {
+        console.log(response);
         resStatus = response.status;
         return response.json();
       })
       .then(response => {
         if(resStatus===200){
-          // console.log(response);
           this.setState({
             formClassName: 'success',
             formSuccessMessage: response.msg
@@ -163,8 +161,6 @@ class InputDataForm extends Component {
             label='Age'
             type='number'
             placeholder='18'
-            min={5}
-            max={130}
             name='age'
             value={this.state.age}
             onChange={this.handleInputChange}

@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const unique = require('mongoose-unique-validator');
+// const unique = require('mongoose-unique-validator');
 const validate = require('mongoose-validator');
 
 const nameValidator = [
@@ -46,7 +46,7 @@ const EngineModelValidator =[
   })
 ];
 // Define the database model
-const TestSchema = new mongoose.Schema({
+const DataSchema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, 'Name is required.'],
@@ -55,7 +55,7 @@ const TestSchema = new mongoose.Schema({
   email: {
     type: String,
     required: [true, 'Email is required.'],
-    unique: true,
+    // unique: true,
     validate: emailValidator
   },
   age: {
@@ -80,6 +80,6 @@ const TestSchema = new mongoose.Schema({
 });
 
 // Use the unique validator plugin
-TestSchema.plugin(unique, { message: 'That {PATH} is already taken.' });
+// DataSchema.plugin(unique, { message: 'That {PATH} is already taken.' });
 
-module.exports = mongoose.model('test', TestSchema);
+module.exports = mongoose.model('Data', DataSchema);

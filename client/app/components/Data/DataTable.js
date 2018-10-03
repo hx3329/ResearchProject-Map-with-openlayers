@@ -9,7 +9,6 @@ class DataTable extends Component {
   render() {
 
     let coords = this.props.datas;
-    console.log(coords);
     coords = coords.map((coord) =>
       <Table.Row key={coord._id}>
         <Table.Cell>{coord.name}</Table.Cell>

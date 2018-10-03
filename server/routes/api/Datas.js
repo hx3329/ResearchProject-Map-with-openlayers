@@ -43,17 +43,13 @@ module.exports = (app) => {
 
 // CREATE
   app.post('/api/datas', postLimiter, (req, res) => {
-
-    // Validate the age
-    let age = sanitizeAge(req.body.age);
-    if (age < 5 && age != '') return res.status(403).json({ success: false, msg: `You're too young for this.` });
-    else if (age > 130 && age != '') return res.status(403).json({ success: false, msg: `You're too old for this.` });
+    // console.log(req);
 
     let newData = new Data({
       name: sanitizeName(req.body.name),
-      email: sanitizeEmail(req.body.email),
-      age: sanitizeAge(req.body.age),
-      gender: sanitizeGender(req.body.gender),
+      email: sanitizeName(req.body.email),
+      age: sanitizePrice(req.body.age),
+      gender: sanitizeName(req.body.gender),
       AircraftModel: req.body.AircraftModel,
       EngineModel: req.body.EngineModel
     });
@@ -100,17 +96,11 @@ module.exports = (app) => {
 
 // UPDATE
   app.put('/api/datas/:id', (req, res) => {
-
-    // Validate the age
-    let age = sanitizeAge(req.body.age);
-    if (age < 5 && age != '') return res.status(403).json({ success: false, msg: `You're too young for this.` });
-    else if (age > 130 && age != '') return res.status(403).json({ success: false, msg: `You're too old for this.` });
-
     let updatedData = {
       name: sanitizeName(req.body.name),
-      email: sanitizeEmail(req.body.email),
-      age: sanitizeAge(req.body.age),
-      gender: sanitizeGender(req.body.gender),
+      email: sanitizeName(req.body.email),
+      age: sanitizePrice(req.body.age),
+      gender: sanitizeName(req.body.gender),
       AircraftModel: req.body.AircraftModel,
       EngineModel: req.body.EngineModel
     };
@@ -198,15 +188,15 @@ module.exports = (app) => {
 sanitizeName = (name) => {
   return stringCapitalizeName(name);
 }
-sanitizeEmail = (email) => {
-  return email.toLowerCase();
+// sanitizeEmail = (email) => {
+//   return email.toLowerCase();
+// }
+sanitizePrice = (price) => {
+  // Return empty if price is non-numeric
+  if (isNaN(price) && price != '') return '';
+  return (price === '') ? price : parseFloat(price);
 }
-sanitizeAge = (age) => {
-  // Return empty if age is non-numeric
-  if (isNaN(age) && age != '') return '';
-  return (age === '') ? age : parseInt(age);
-}
-sanitizeGender = (gender) => {
-  // Return empty if it's neither of the two
-  return (gender === 'm' || gender === 'f') ? gender : '';
-}
+// sanitizeGender = (gender) => {
+//   // Return empty if it's neither of the two
+//   return (gender === 'm' || gender === 'f') ? gender : '';
+// }
